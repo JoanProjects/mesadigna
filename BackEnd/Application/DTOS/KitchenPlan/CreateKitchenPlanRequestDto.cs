@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Core.Domain.Enums;
 
-namespace Application.DTOS.Kitchen;
+namespace Application.DTOS.KitchenPlan;
 
 public class CreateKitchenPlanRequestDto
 {
@@ -19,4 +19,5 @@ public class CreateKitchenPlanRequestDto
 
     [MaxLength(1000)]
     public string? Notes { get; set; }
+    
 }

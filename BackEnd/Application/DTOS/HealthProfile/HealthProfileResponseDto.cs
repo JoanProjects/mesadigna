@@ -1,4 +1,4 @@
-namespace Application.DTOS.Health;
+namespace Application.DTOS.HealthProfile;
 
 public class HealthProfileResponseDto
 {

@@ -1,4 +1,6 @@
-namespace Application.DTOS.Kitchen;
+using Application.DTOS.Kitchen;
+
+namespace Application.DTOS.Meal;
 
 public class MealResponseDto
 {

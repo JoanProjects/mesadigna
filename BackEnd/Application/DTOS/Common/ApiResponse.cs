@@ -1,4 +1,4 @@
-﻿namespace Application.Common;
+﻿namespace Application.DTOS.Common;
 
 public class ApiResponse<T>
 {

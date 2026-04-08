@@ -1,6 +1,6 @@
 using System.Net;
 using System.Text.Json;
-using Application.Common;
+using Application.DTOS.Common;
 using Core.Domain.Exception;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;

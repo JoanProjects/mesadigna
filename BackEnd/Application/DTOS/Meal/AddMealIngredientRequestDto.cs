@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Core.Domain.Enums;
 
-namespace Application.DTOS.Kitchen;
+namespace Application.DTOS.Meal;
 
 public class AddMealIngredientRequestDto
 {

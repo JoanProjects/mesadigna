@@ -1,15 +1,13 @@
 using System.ComponentModel.DataAnnotations;
 using Core.Domain.Enums;
 
-namespace Application.DTOS.Kitchen;
+namespace Application.DTOS.KitchenPreparation;
 
 public class CreatePreparationRequestDto
 {
-    [Required]
-    public int DailyKitchenPlanId { get; set; }
+    [Required] public int DailyKitchenPlanId { get; set; }
 
-    [Required]
-    public int MealId { get; set; }
+    [Required] public int MealId { get; set; }
 
     public DietType DietType { get; set; } = DietType.Normal;
 
@@ -17,6 +15,5 @@ public class CreatePreparationRequestDto
     [Range(1, int.MaxValue, ErrorMessage = "Las raciones estimadas deben ser al menos 1.")]
     public int EstimatedServings { get; set; }
 
-    [MaxLength(500)]
-    public string? Notes { get; set; }
+    [MaxLength(500)] public string? Notes { get; set; }
 }

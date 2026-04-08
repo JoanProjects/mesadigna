@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Core.Domain.Enums;
 
-namespace Application.DTOS.Health;
+namespace Application.DTOS.HealthProfile;
 
 public class UpsertHealthProfileRequestDto
 {
