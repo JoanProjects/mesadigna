@@ -1,8 +1,8 @@
-using Core.Domain.Entities;
 using Core.Domain.Common;
+using Core.Domain.Entities;
 using Core.Domain.Enums;
 
-namespace Infrastructure.Repositories;
+namespace Infrastructure.Repositories.Interfaces;
 
 public interface IBeneficiaryRepository : IBaseRepository<Beneficiary>
 {

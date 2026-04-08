@@ -1,6 +1,6 @@
 using Core.Domain.Entities;
 
-namespace Infrastructure.Repositories;
+namespace Infrastructure.Repositories.Interfaces;
 
 public interface IMealRepository : IBaseRepository<Meal>
 {

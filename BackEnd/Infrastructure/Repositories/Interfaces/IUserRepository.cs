@@ -1,7 +1,7 @@
-using Core.Domain.Entities;
 using Core.Domain.Common;
+using Core.Domain.Entities;
 
-namespace Infrastructure.Repositories;
+namespace Infrastructure.Repositories.Interfaces;
 
 public interface IUserRepository : IBaseRepository<User>
 {
