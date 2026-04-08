@@ -6,4 +6,14 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Folder Include="DTOS\HealthProfile\" />
+      <Folder Include="DTOS\Ingredient\" />
+      <Folder Include="DTOS\KitchenPlan\" />
+      <Folder Include="DTOS\KitchenPreparation\" />
+      <Folder Include="DTOS\Meal\" />
+      <Folder Include="DTOS\Prediction\" />
+      <Folder Include="DTOS\User\" />
+    </ItemGroup>
+
 </Project>
