@@ -3,7 +3,7 @@ using Core.Domain.Enums;
 
 namespace Core.Domain.Entities;
 
-public abstract class Ingredient : BaseEntity
+public class Ingredient : BaseEntity
 {
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }
