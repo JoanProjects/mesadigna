@@ -4,14 +4,14 @@ namespace Application.Services.Interfaces;
 
 public interface IPredictionService
 {
-    Task<PortionPredictionResponseDto> GetPortionRecommendationAsync(
-        GeneratePredictionRequestDto request,
+    Task<PythonPredictionResponseDto> GetPortionRecommendationAsync(
+        PythonPredictionRequestDto request,
         CancellationToken cancellationToken = default);
 
     Task<ModelInfoResponseDto> GetModelInfoAsync(
         CancellationToken cancellationToken = default);
 
-    Task<RetrainResponseDto> RetrainModelAsync(
-        RetrainRequestDto request,
+    Task<PythonRetrainResponseDto> RetrainModelAsync(
+        PythonRetrainRequestDto request,
         CancellationToken cancellationToken = default);
 }

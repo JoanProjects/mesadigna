@@ -1,6 +1,4 @@
-using Application.DTOS.Prediction;
-
-namespace Infrastructure.ExternalServices.Prediction.Dtos;
+namespace Application.DTOS.Prediction;
 
 public class PythonRetrainResponseDto
 {
