@@ -29,8 +29,7 @@ public class AttendancesController : ControllerBase
         return StatusCode(StatusCodes.Status201Created,
             ApiResponse<AttendanceResponseDto>.Ok(result, "Check-in registrado exitosamente."));
     }
-
-
+    
     [HttpGet("by-date")]
     [ProducesResponseType(typeof(ApiResponse<List<AttendanceResponseDto>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetByDate(
@@ -40,8 +39,7 @@ public class AttendancesController : ControllerBase
         var result = await _attendanceService.GetByDateAsync(date, cancellationToken);
         return Ok(ApiResponse<List<AttendanceResponseDto>>.Ok(result));
     }
-
-
+    
     [HttpGet("by-range")]
     [ProducesResponseType(typeof(ApiResponse<List<AttendanceResponseDto>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetByRange(
@@ -52,8 +50,7 @@ public class AttendancesController : ControllerBase
         var result = await _attendanceService.GetByDateRangeAsync(from, to, cancellationToken);
         return Ok(ApiResponse<List<AttendanceResponseDto>>.Ok(result));
     }
-
-
+    
     [HttpGet("summary-daily")]
     [ProducesResponseType(typeof(ApiResponse<DailySummaryResponseDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetDailySummary(
