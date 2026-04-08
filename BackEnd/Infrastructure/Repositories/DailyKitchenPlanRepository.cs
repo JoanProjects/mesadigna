@@ -1,9 +1,9 @@
 
 
 using Core.Domain.Entities;
+using Core.Domain.Interfaces.Repositories;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
-using Infrastructure.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;

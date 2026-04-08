@@ -2,10 +2,8 @@ using System.Net;
 using System.Text.Json;
 using Application.DTOS.Common;
 using Core.Domain.Exception;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 
-namespace Infrastructure.Middleware;
+namespace API.Middleware;
 
 public class ExceptionHandlingMiddleware
 {
