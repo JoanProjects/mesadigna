@@ -1,4 +1,6 @@
-namespace Application.DTOS.Prediction;
+using Application.DTOS.Prediction;
+
+namespace Infrastructure.ExternalServices.Prediction.Dtos;
 
 public class PythonRetrainRequestDto
 {
