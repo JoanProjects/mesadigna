@@ -10,6 +10,7 @@ using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Polly;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,14 +48,29 @@ builder.Services.AddScoped<IKitchenService, KitchenService>();
 builder.Services.AddScoped<IIngredientService, IngredientService>();
 builder.Services.AddScoped<IMealService, MealService>();
 builder.Services.AddScoped<IKitchenPlanService, KitchenPlanService>();
-builder.Services.AddScoped<IPredictionOrchestrationService, PredictionOrchestrationService>();
+builder.Services.AddHttpClient<IPredictionService, PythonPredictionService>().AddStandardResilienceHandler();
 
 // ── Microservicio Python ───────────────────────────────────────
 builder.Services.AddHttpClient<IPredictionService, PythonPredictionService>(client =>
-{
-    client.BaseAddress = new Uri(builder.Configuration["PredictionService:BaseUrl"] ?? "http://localhost:8000");
-    client.Timeout = TimeSpan.FromSeconds(30);
-});
+    {
+        client.BaseAddress = new Uri(builder.Configuration["PredictionService:BaseUrl"] ?? "http://localhost:8000");
+        client.Timeout = TimeSpan.FromSeconds(5);
+    })
+    .AddResilienceHandler("prediction", resilienceBuilder =>
+    {
+        resilienceBuilder.AddCircuitBreaker(new()
+        {
+            SamplingDuration = TimeSpan.FromSeconds(30),
+            FailureRatio = 0.5,
+            MinimumThroughput = 3,
+            BreakDuration = TimeSpan.FromSeconds(15)
+        });
+        resilienceBuilder.AddRetry(new()
+        {
+            MaxRetryAttempts = 2,
+            Delay = TimeSpan.FromSeconds(1)
+        });
+    });
 
 // ── JWT ────────────────────────────────────────────────────────
 var jwtKey = builder.Configuration["Jwt:Key"];
@@ -90,6 +106,14 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod());
 });
 
+// ── Health Checks ──────────────────────────────────────────────
+builder.Services.AddHealthChecks()
+    .AddUrlGroup(
+        new Uri((builder.Configuration["PredictionService:BaseUrl"] ?? "http://localhost:8000") + "/health"),
+        name: "prediction-service",
+        failureStatus: Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Degraded
+    );
+
 // ── Controllers + OpenAPI ──────────────────────────────────────
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -108,5 +132,7 @@ app.UseCors("FrontendDev");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHealthChecks("/health");
+
 
 app.Run();
