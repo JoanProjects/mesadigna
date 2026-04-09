@@ -48,19 +48,8 @@ public class PredictionOrchestrationService : IPredictionOrchestrationService
         var requestDto = await BuildPredictionRequestAsync(targetDate, cancellationToken);
 
         // 2. Intentar microservicio Python, con fallback heurístico
-        PythonPredictionResponseDto pythonResponse;
-        bool usedFallback = false;
-
-        try
-        {
-            pythonResponse = await _predictionService.GetPortionRecommendationAsync(requestDto, cancellationToken);
-        }
-        catch (InvalidOperationException ex)
-        {
-            _logger.LogWarning(ex, "Microservicio Python no disponible, usando fallback heurístico");
-            pythonResponse = BuildFallbackPrediction(requestDto, targetDate);
-            usedFallback = true;
-        }
+        var pythonResponse = await _predictionService.GetPortionRecommendationAsync(requestDto, cancellationToken);
+        bool usedFallback = pythonResponse.Metadata.ModelName == "HeuristicFallback";
 
         // 3. Persistir predicción y snapshot
         var prediction = new PortionPrediction
@@ -372,75 +361,7 @@ public class PredictionOrchestrationService : IPredictionOrchestrationService
             AttendanceLast30DaysAvg = Math.Round(avg30, 1)
         };
     }
-
-    /// <summary>
-    /// Fallback heurístico cuando el microservicio Python no está disponible.
-    /// Usa el promedio de asistencia de los últimos 30 días + 10% de margen de seguridad.
-    /// </summary>
-    private static PythonPredictionResponseDto BuildFallbackPrediction(
-        PythonPredictionRequestDto request,
-        DateOnly targetDate)
-    {
-        // Usar el promedio más confiable disponible
-        double baseEstimate = request.AttendanceLast7DaysAvg > 0
-            ? request.AttendanceLast7DaysAvg
-            : request.AttendanceLast30DaysAvg > 0
-                ? request.AttendanceLast30DaysAvg
-                : request.TotalActiveBeneficiaries * 0.65; // 65% de asistencia base
-
-        // Reducir en fines de semana
-        var dayOfWeek = targetDate.DayOfWeek;
-        if (dayOfWeek == System.DayOfWeek.Saturday || dayOfWeek == System.DayOfWeek.Sunday)
-            baseEstimate *= 0.70;
-
-        // Margen de seguridad 10%
-        int recommended = (int)Math.Ceiling(baseEstimate * 1.10);
-
-        // Distribución dietaria proporcional
-        int total = Math.Max(request.TotalActiveBeneficiaries, 1);
-        var dietary = request.DietaryDistribution;
-        int hyp = ProportionalPortions(dietary.HypertensionCount, total, baseEstimate);
-        int diab = ProportionalPortions(dietary.DiabetesCount, total, baseEstimate);
-        int allerg = ProportionalPortions(dietary.AllergiesCount, total, baseEstimate);
-        int special = ProportionalPortions(dietary.DietaryRestrictionsCount, total, baseEstimate);
-        int totalSpecial = hyp + diab + allerg + special;
-        int regular = Math.Max(recommended - totalSpecial, 0);
-
-        return new PythonPredictionResponseDto
-        {
-            TargetDate = request.TargetDate,
-            RecommendedPortions = recommended,
-            RegularPortions = regular,
-            SpecialDietPortions = totalSpecial,
-            Confidence = 0.5, // Confianza baja para fallback
-            DietaryBreakdown = new DietaryBreakdownDto
-            {
-                Regular = regular,
-                Hypertension = hyp,
-                Diabetes = diab,
-                Allergies = allerg,
-                SpecialDiet = special
-            },
-            Metadata = new PredictionMetadataDto
-            {
-                ModelName = "HeuristicFallback",
-                ModelVersion = "fallback-1.0",
-                FeaturesUsed = ["attendance_avg", "day_of_week", "dietary_distribution"],
-                TrainingSamples = 0,
-                FeatureImportances = new Dictionary<string, double>()
-            },
-            GeneratedAt = DateTime.UtcNow.ToString("o"),
-            EvaluationMetrics = null
-        };
-    }
-
-    private static int ProportionalPortions(int restrictionCount, int totalBeneficiaries, double predictedTotal)
-    {
-        if (restrictionCount <= 0) return 0;
-        double proportion = restrictionCount / (double)Math.Max(totalBeneficiaries, 1);
-        return Math.Max((int)Math.Ceiling(predictedTotal * proportion), 1);
-    }
-
+    
     private static PredictionInputSnapshot BuildInputSnapshot(
         PythonPredictionRequestDto request,
         DateOnly targetDate)
