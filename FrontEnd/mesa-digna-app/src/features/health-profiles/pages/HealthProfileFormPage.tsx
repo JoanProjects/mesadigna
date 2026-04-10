@@ -4,12 +4,12 @@ import { useNotification } from '@/app/providers/NotificationProvider';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useForm } from '@/hooks/useForm';
 import { PageHeader } from '@/components/shared/PageHeader';
-import { Textarea, Checkbox, Select, Button, Alert, Loader, Card } from '@/components/ui';
 import { healthProfileService } from '../services/healthProfile.service';
 import { healthProfileSchema } from '../schemas/healthProfile.schema';
 import { SPECIAL_CONDITION_OPTIONS } from '@/constants/options';
 import { ApiError } from '@/services/http/errors';
 import { getErrorMessage } from '@/utils/formErrors';
+import {Alert, Button, Card, Checkbox, Loader, Textarea} from "@/components/ui";
 
 export default function HealthProfileFormPage() {
   const { id } = useParams();
@@ -62,8 +62,28 @@ export default function HealthProfileFormPage() {
             <Checkbox label="Hipertensión" checked={values.hasHypertension as boolean} onChange={checked => setValue('hasHypertension', checked)} />
             <Checkbox label="Diabetes" checked={values.hasDiabetes as boolean} onChange={checked => setValue('hasDiabetes', checked)} />
           </div>
-          <Select label="Condiciones especiales" value={values.specialConditions ?? ''} onChange={handleChange('specialConditions')} options={SPECIAL_CONDITION_OPTIONS} placeholder="Seleccione..." error={errors.specialConditions} />
-          <Textarea label="Notas nutricionales" value={values.nutritionalNotes ?? ''} onChange={handleChange('nutritionalNotes')} error={errors.nutritionalNotes} rows={3} />
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-semibold text-text-secondary uppercase tracking-wide">Condiciones especiales</label>
+            <div className="flex flex-col gap-2">
+              {SPECIAL_CONDITION_OPTIONS.filter(o => o.value !== 'Ninguna').map(option => (
+                  <Checkbox
+                      key={option.value}
+                      label={option.label}
+                      checked={((values.specialConditions as string) ?? '').split(', ').includes(option.value)}
+                      onChange={(checked) => {
+                        const current = ((values.specialConditions as string) ?? '')
+                            .split(', ')
+                            .filter(v => v && v !== 'Ninguna');
+                        const updated = checked
+                            ? [...current, option.value]
+                            : current.filter(v => v !== option.value);
+                        setValue('specialConditions', updated.length > 0 ? updated.join(', ') : 'Ninguna');
+                      }}
+                  />
+              ))}
+            </div>
+            {errors.specialConditions && <p className="text-xs text-danger-500">{errors.specialConditions}</p>}
+          </div>          <Textarea label="Notas nutricionales" value={values.nutritionalNotes ?? ''} onChange={handleChange('nutritionalNotes')} error={errors.nutritionalNotes} rows={3} />
           <Textarea label="Notas adicionales" value={values.additionalNotes ?? ''} onChange={handleChange('additionalNotes')} error={errors.additionalNotes} rows={3} />
           <div className="flex gap-3 pt-2">
             <Button type="submit" loading={saving}>Guardar perfil</Button>

@@ -11,16 +11,16 @@ export const STATUS_OPTIONS = [
 ];
 
 export const UNIT_OPTIONS = [
-  { value: 'Gramos', label: 'Gramos' },
-  { value: 'Kilogramos', label: 'Kilogramos' },
-  { value: 'Litros', label: 'Litros' },
-  { value: 'Mililitros', label: 'Mililitros' },
-  { value: 'Unidades', label: 'Unidades' },
-  { value: 'Tazas', label: 'Tazas' },
-  { value: 'Cucharadas', label: 'Cucharadas' },
-  { value: 'Cucharaditas', label: 'Cucharaditas' },
-  { value: 'Onzas', label: 'Onzas' },
-  { value: 'Libras', label: 'Libras' },
+  { value: 'Unidad', label: 'Unidades' },
+  { value: 'Kilogramo', label: 'Kilogramos' },
+  { value: 'Gramo', label: 'Gramos' },
+  { value: 'Litro', label: 'Litros' },
+  { value: 'Mililitro', label: 'Mililitros' },
+  { value: 'Libra', label: 'Libras' },
+  { value: 'Onza', label: 'Onzas' },
+  { value: 'Taza', label: 'Tazas' },
+  { value: 'Cucharada', label: 'Cucharadas' },
+  { value: 'Cucharadita', label: 'Cucharaditas' },
 ];
 
 export const MEAL_TYPE_OPTIONS = [

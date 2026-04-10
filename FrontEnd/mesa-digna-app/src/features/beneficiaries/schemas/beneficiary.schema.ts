@@ -3,17 +3,18 @@ import {object, string} from 'yup';
 const calculateAge = (dateOfBirth: string) => {
     if (!dateOfBirth) return null;
 
-    const today = new Date();
-    const birthDate = new Date(dateOfBirth);
-
+    const birthDate = new Date(dateOfBirth + 'T00:00:00Z');
     if (Number.isNaN(birthDate.getTime())) return null;
 
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
+    const now = new Date();
+    const todayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+
+    let age = todayUTC.getUTCFullYear() - birthDate.getUTCFullYear();
+    const monthDiff = todayUTC.getUTCMonth() - birthDate.getUTCMonth();
 
     if (
         monthDiff < 0 ||
-        (monthDiff === 0 && today.getDate() < birthDate.getDate())
+        (monthDiff === 0 && todayUTC.getUTCDate() < birthDate.getUTCDate())
     ) {
         age--;
     }
@@ -29,7 +30,15 @@ export const beneficiarySchema = object({
         .required('El apellido es obligatorio.')
         .max(100, 'Máximo 100 caracteres.'),
     dateOfBirth: string()
-        .required('La fecha de nacimiento es obligatoria.'),
+        .required('La fecha de nacimiento es obligatoria.')
+        .test('not-future', 'La fecha de nacimiento no puede ser futura.', (value) => {
+            if (!value) return true;
+            const birth = new Date(value + 'T00:00:00Z');
+            if (Number.isNaN(birth.getTime())) return false;
+            const now = new Date();
+            const todayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+            return birth <= todayUTC;
+        }),
     sex: string()
         .required('El sexo es obligatorio.'),
     identityDocument: string()
