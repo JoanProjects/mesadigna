@@ -48,6 +48,7 @@ builder.Services.AddScoped<IKitchenService, KitchenService>();
 builder.Services.AddScoped<IIngredientService, IngredientService>();
 builder.Services.AddScoped<IMealService, MealService>();
 builder.Services.AddScoped<IKitchenPlanService, KitchenPlanService>();
+builder.Services.AddScoped<IPredictionOrchestrationService, PredictionOrchestrationService>();
 builder.Services.AddHttpClient<IPredictionService, PythonPredictionService>().AddStandardResilienceHandler();
 
 // ── Microservicio Python ───────────────────────────────────────
