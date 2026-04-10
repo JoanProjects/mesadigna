@@ -6,7 +6,7 @@ export interface HealthProfileResponse {
   allergies: string | null;
   hasHypertension: boolean;
   hasDiabetes: boolean;
-  specialConditions: string | null;
+  specialConditions: string | number | null;
   nutritionalNotes: string | null;
   additionalNotes: string | null;
   hasDietaryConsiderations: boolean;
@@ -20,7 +20,7 @@ export interface UpsertHealthProfileRequest {
   allergies?: string | null;
   hasHypertension: boolean;
   hasDiabetes: boolean;
-  specialConditions?: string | null;
+  specialConditions?: number;
   nutritionalNotes?: string | null;
   additionalNotes?: string | null;
 }

@@ -2,8 +2,9 @@ import { object, string, number } from 'yup';
 
 export const mealIngredientSchema = object({
   ingredientId: number()
-    .required('Seleccione un ingrediente.')
-    .typeError('Seleccione un ingrediente.'),
+      .required('Seleccione un ingrediente.')
+      .min(1, 'Seleccione un ingrediente.')
+      .typeError('Seleccione un ingrediente.'),
   quantityPerServing: number()
     .required('La cantidad por porción es obligatoria.')
     .min(0.01, 'Debe ser mayor a 0.')

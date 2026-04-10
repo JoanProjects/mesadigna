@@ -1,5 +1,6 @@
 import { createBrowserRouter, Navigate } from 'react-router';
 import { lazy, Suspense, type ComponentType } from 'react';
+import { RouteErrorBoundary } from '@/components/feedback/ErrorBoundary';
 import { ProtectedRoute } from './ProtectedRoute';
 import { RoleRoute } from './RoleRoute';
 import { MainLayout } from '@/app/layouts/MainLayout';
@@ -22,6 +23,7 @@ export const router = createBrowserRouter([
   },
   {
     element: <ProtectedRoute />,
+    errorElement: <RouteErrorBoundary />,
     children: [
       {
         element: <MainLayout />,

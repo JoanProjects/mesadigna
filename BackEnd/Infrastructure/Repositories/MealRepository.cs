@@ -1,3 +1,5 @@
+using System.Linq.Expressions;
+using Core.Domain.Common;
 using Core.Domain.Entities;
 using Core.Domain.Interfaces.Repositories;
 using Infrastructure.Data;
@@ -17,6 +19,33 @@ public class MealRepository : BaseRepository<Meal>, IMealRepository
             .Include(m => m.MealIngredients)
             .ThenInclude(mi => mi.Ingredient)
             .FirstOrDefaultAsync(m => m.Id == id, cancellationToken);
+    }
+
+    public async Task<PagedResult<Meal>> GetPagedWithIngredientsAsync(
+        int page, int pageSize,
+        Expression<Func<Meal, bool>>? filter = null,
+        Expression<Func<Meal, object>>? orderBy = null,
+        CancellationToken cancellationToken = default)
+    {
+        var query = DbSet.AsNoTracking()
+            .Include(m => m.MealIngredients)
+            .IgnoreQueryFilters().AsQueryable();
+
+        if (filter is not null)
+            query = query.Where(filter);
+
+        query = orderBy is not null
+            ? query.OrderBy(orderBy)
+            : query.OrderBy(e => e.Id);
+
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var items = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        return PagedResult<Meal>.Create(items, page, pageSize, totalCount);
     }
 
     public async Task<bool> ExistsByNameAsync(string name, int? excludeId = null,

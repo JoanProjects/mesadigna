@@ -29,6 +29,8 @@ export default function CheckInPage() {
     if (submittingRef.current) return;
     submittingRef.current = true;
     setServerError(null);
+    setLastCheckIn(null);
+
     const valid = await validate();
     if (!valid) {
       submittingRef.current = false;
@@ -37,7 +39,11 @@ export default function CheckInPage() {
 
     setSaving(true);
     try {
-      const res = await attendanceService.checkIn(values);
+      const res = await attendanceService.checkIn({
+        ...values,
+        internalCode: values.internalCode.trim(),
+        notes: values.notes?.trim() || undefined,
+      });
       if (res.success && res.data) {
         setLastCheckIn(res.data);
         notify(`Check-in exitoso: ${res.data.beneficiaryName}`);

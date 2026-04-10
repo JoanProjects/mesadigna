@@ -56,7 +56,7 @@ public class MealService : IMealService
     public async Task<PagedResponseDto<MealResponseDto>> GetAllPagedAsync(int page, int pageSize, string? search = null,
         CancellationToken cancellationToken = default)
     {
-        var pagedResult = await _mealRepository.GetPagedAsync(
+        var pagedResult = await _mealRepository.GetPagedWithIngredientsAsync(
             page, pageSize,
             filter: string.IsNullOrWhiteSpace(search) ? null : m => m.Name.ToLower().Contains(search.ToLower()),
             orderBy: m => m.Name,
