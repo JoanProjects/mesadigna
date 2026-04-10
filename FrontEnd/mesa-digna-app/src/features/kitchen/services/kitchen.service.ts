@@ -16,7 +16,7 @@ export const kitchenService = {
     return httpGet<DailyKitchenSummary>(`${BASE}/daily-summary`, { date });
   },
 
-  getBeneficiariesByCategory(date: string, categoryKey: string, page = 1, pageSize = 50) {
+  getBeneficiariesByCategory(date: string, categoryKey: string, page = 1, pageSize = 10) {
     return httpGet<PagedResponse<DietCategoryBeneficiary>>(
       `${BASE}/diet-category/${encodeURIComponent(categoryKey)}/beneficiaries`,
       { date, page, pageSize },
