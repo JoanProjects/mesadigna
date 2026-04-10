@@ -2,7 +2,7 @@ import { cn } from '@/utils/cn';
 import type { ReactNode } from 'react';
 
 interface BadgeProps {
-  variant?: 'active' | 'inactive' | 'suspended' | 'info' | 'warning' | 'role';
+  variant?: 'active' | 'inactive' | 'suspended' | 'info' | 'warning' | 'role' | 'danger' | 'success';
   children: ReactNode;
 }
 
@@ -13,6 +13,8 @@ const variants: Record<string, string> = {
   info: 'bg-primary-50 text-primary-500 border-primary-200',
   warning: 'bg-warning-100 text-warning-500 border-warning-200',
   role: 'bg-accent-50 text-accent-500 border-accent-200',
+  danger: 'bg-danger-100 text-danger-500 border-danger-200',
+  success: 'bg-success-100 text-success-600 border-success-200',
 };
 
 export function Badge({ variant = 'info', children }: BadgeProps) {
