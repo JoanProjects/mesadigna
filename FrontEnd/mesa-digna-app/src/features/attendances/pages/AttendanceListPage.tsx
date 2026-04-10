@@ -175,9 +175,8 @@ export default function AttendanceListPage() {
               </tbody>
             </table>
           </div>
-          <div className="flex items-center justify-center py-4 border-t border-gray-100">
+          <div className="px-2 py-4 border-t border-gray-100">
             <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
-            <span className="text-xs text-text-light ml-4">{filtered.length} registros</span>
           </div>
         </div>
       )}
