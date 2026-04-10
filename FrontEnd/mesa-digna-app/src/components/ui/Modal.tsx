@@ -28,7 +28,7 @@ export function Modal({ open, onClose, title, subtitle, children, footer }: Moda
       <div className="fixed inset-0 z-50 bg-black/50" onClick={onClose} />
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
         <div
-          className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden pointer-events-auto"
+          className="relative bg-white rounded-2xl shadow-2xl w-full max-w-xl max-h-[50] flex flex-col overflow-hidden pointer-events-auto"
           style={{ animation: 'fadeIn 0.2s ease-out' }}
           onClick={e => e.stopPropagation()}
         >

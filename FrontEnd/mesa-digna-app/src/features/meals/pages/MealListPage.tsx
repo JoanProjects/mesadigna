@@ -14,14 +14,13 @@ export default function MealListPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
-  const [totalCount, setTotalCount] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
   const loadData = useCallback(async (p: number, s: string) => {
     setLoading(true);
     try {
       const res = await mealService.getAll(p, 10, s || undefined);
-      if (res.success && res.data) { setMeals(res.data.items); setTotalCount(res.data.totalCount); setTotalPages(res.data.totalPages); }
+      if (res.success && res.data) { setMeals(res.data.items);  setTotalPages(res.data.totalPages); }
     } catch { /* silent */ }
     setLoading(false);
   }, []);
@@ -62,9 +61,8 @@ export default function MealListPage() {
               </tr>
             ))}</tbody>
           </table></div>
-          <div className="flex items-center justify-center gap-2 py-4 border-t border-gray-100">
+          <div className="px-2 py-4 border-t border-gray-100">
             <Pagination page={page} totalPages={totalPages} onPageChange={onPageChange} />
-            <span className="text-xs text-text-light ml-2">{totalCount} registros</span>
           </div>
         </div>
       )}
