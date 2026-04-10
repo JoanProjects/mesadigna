@@ -69,7 +69,7 @@ export default function DashboardPage() {
         kitchenService.getIngredientsSummary().then(res => {
           if (res.success && res.data) setLowStockCount(res.data.lowStockCount);
         }).catch(() => {}),
-        kitchenService.getDietarySummary().then(res => {
+        kitchenService.getDietarySummary({ page: 1, pageSize: 1 }).then(res => {
           if (res.success && res.data) setDietaryRestrictions(res.data.totalBeneficiariesWithRestrictions);
         }).catch(() => {}),
       );
