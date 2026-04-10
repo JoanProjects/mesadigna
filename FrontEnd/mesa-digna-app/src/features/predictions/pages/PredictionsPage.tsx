@@ -72,9 +72,6 @@ export default function PredictionsPage() {
               {prediction.actualAttendance !== null && (
                 <div className="flex justify-between"><dt className="text-sm text-text-secondary">Asistencia real</dt><dd className="text-sm font-semibold">{prediction.actualAttendance}</dd></div>
               )}
-              {prediction.accuracyScore !== null && (
-                <div className="flex justify-between"><dt className="text-sm text-text-secondary">Precisión</dt><dd className="text-sm font-semibold">{(prediction.accuracyScore * 100).toFixed(1)}%</dd></div>
-              )}
             </dl>
           </Card>
 
