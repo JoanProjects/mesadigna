@@ -14,17 +14,18 @@ import {UNIT_OPTIONS} from '@/constants/options';
 import {ApiError} from '@/services/http/errors';
 import {getErrorMessage} from '@/utils/formErrors';
 import type {MealResponse} from '../types/meal.types';
-import type {IngredientResponse} from '@/features/ingredients/types/ingredient.types';
+
+type SelectOption = { value: string; label: string };
 
 export default function MealDetailPage() {
     const {id} = useParams();
     const {success: notify, error: notifyError} = useNotification();
     const [meal, setMeal] = useState<MealResponse | null>(null);
     const [loading, setLoading] = useState(true);
-    const [availableIngredients, setAvailableIngredients] = useState<IngredientResponse[]>([]);
     const [showAddForm, setShowAddForm] = useState(false);
     const [saving, setSaving] = useState(false);
     const [confirmRemove, setConfirmRemove] = useState<number | null>(null);
+    const [ingredientOptions, setIngredientOptions] = useState<SelectOption[]>([]);
 
     usePageTitle(meal?.name || 'Detalle comida');
 
@@ -53,13 +54,26 @@ export default function MealDetailPage() {
 
     useEffect(() => {
         loadMeal();
-        ingredientService.getAll(1, 200).then(res => {
-            if (res.success && res.data) setAvailableIngredients(res.data.items);
-        }).catch(() => {
-        });
     }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const submittingRef = useRef(false);
+
+    const loadIngredients = async () => {
+        try {
+            const res = await ingredientService.getAll(1, 100);
+            if (res.success && res.data) {
+                setIngredientOptions(res.data.items.map(i => ({value: String(i.id), label: i.name})));
+            }
+        } catch (err) {
+            console.error('Error loading ingredients:', err);
+        }
+    };
+
+    useEffect(() => {
+        if (showAddForm && ingredientOptions.length === 0) {
+            loadIngredients();
+        }
+    }, [showAddForm, ingredientOptions.length]);
 
     const addIngredient = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -101,8 +115,6 @@ export default function MealDetailPage() {
 
     if (loading) return <Loader message="Cargando comida..."/>;
     if (!meal) return <div className="text-center py-12 text-text-secondary">Comida no encontrada.</div>;
-
-    const ingredientOptions = availableIngredients.map(i => ({value: String(i.id), label: i.name}));
 
     return (
         <>
@@ -153,10 +165,14 @@ export default function MealDetailPage() {
                     {showAddForm ? (
                         <form onSubmit={addIngredient} className="space-y-3 p-4 bg-gray-50 rounded-lg">
                             {serverError && <Alert variant="error">{serverError}</Alert>}
-                            <Select label="Ingrediente" value={String(values.ingredientId)}
-                                    onChange={e => setValue('ingredientId', Number(e.target.value))}
-                                    options={ingredientOptions} placeholder="Seleccione..."
-                                    error={errors.ingredientId}/>
+                            <Select
+                                label="Ingrediente"
+                                value={String(values.ingredientId || '')}
+                                onChange={e => setValue('ingredientId', Number(e.target.value))}
+                                options={ingredientOptions}
+                                placeholder="Seleccione..."
+                                error={errors.ingredientId}
+                            />
 
                             <div className="grid grid-cols-2 gap-3">
                                 <Input label="Cantidad por porción" type="number" step="0.01" min="0.01"

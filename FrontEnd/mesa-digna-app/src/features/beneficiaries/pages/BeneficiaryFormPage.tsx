@@ -239,6 +239,7 @@ export default function BeneficiaryFormPage() {
                             value={values.status}
                             onChange={handleChange('status')}
                             options={STATUS_OPTIONS}
+                            placeholder="Seleccione..."
                             error={errors.status}
                         />
                     )}
