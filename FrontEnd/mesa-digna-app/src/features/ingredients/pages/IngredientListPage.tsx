@@ -7,6 +7,8 @@ import { usePageTitle } from '@/hooks/usePageTitle';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { Loader, Badge, Pagination, SearchInput, EmptyState, Button } from '@/components/ui';
 import { ConfirmDialog } from '@/components/feedback/ConfirmDialog';
+import { ApiError } from '@/services/http/errors';
+import { getErrorMessage } from '@/utils/formErrors';
 import { ingredientService } from '../services/ingredient.service';
 import type { IngredientResponse } from '../types/ingredient.types';
 
@@ -64,7 +66,12 @@ export default function IngredientListPage() {
       notify(selectedActive ? 'Ingrediente desactivado.' : 'Ingrediente activado.');
       setConfirmOpen(false);
       loadData(page, search);
-    } catch {
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 409) {
+        notifyError(getErrorMessage(err));
+        return;
+      }
+
       notifyError('Error al cambiar estado.');
     }
   };
