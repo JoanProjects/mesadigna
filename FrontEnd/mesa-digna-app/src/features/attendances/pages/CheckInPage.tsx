@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import {useRef, useState} from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleCheck } from '@fortawesome/free-solid-svg-icons';
 import { useNotification } from '@/app/providers/NotificationProvider';
@@ -22,11 +22,18 @@ export default function CheckInPage() {
   const [saving, setSaving] = useState(false);
   const [lastCheckIn, setLastCheckIn] = useState<AttendanceResponse | null>(null);
 
+  const submittingRef = useRef(false);
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setServerError(null);
     const valid = await validate();
-    if (!valid) return;
+    if (!valid) {
+      submittingRef.current = false;
+      return;
+    }
 
     setSaving(true);
     try {
@@ -42,6 +49,7 @@ export default function CheckInPage() {
       setServerError(err instanceof ApiError ? getErrorMessage(err) : 'Error de conexión.');
     } finally {
       setSaving(false);
+      submittingRef.current = false;
     }
   };
 

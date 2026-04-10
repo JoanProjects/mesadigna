@@ -1,4 +1,4 @@
-import { httpGet, httpPost, httpPut, httpDelete } from '@/services/http/client';
+import { httpGet, httpPost, httpPut } from '@/services/http/client';
 import type { ApiResponse, PagedResponse } from '@/services/http/types';
 import type { IngredientResponse, CreateIngredientRequest, UpdateIngredientRequest } from '../types/ingredient.types';
 
@@ -26,6 +26,6 @@ export const ingredientService = {
   },
 
   deactivate(id: number): Promise<ApiResponse<object>> {
-    return httpDelete(`${BASE}/${id}`);
+    return httpPut(`${BASE}/${id}/change-status`);
   },
 };

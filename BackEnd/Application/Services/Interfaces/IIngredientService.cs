@@ -16,5 +16,5 @@ public interface IIngredientService
     Task<IngredientResponseDto?> UpdateAsync(int id, UpdateIngredientRequestDto request,
         CancellationToken cancellationToken = default);
 
-    Task<bool> DeactivateAsync(int id, CancellationToken cancellationToken = default);
+    Task<bool> ChangeStatusAsync(int id, CancellationToken cancellationToken = default);
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import {useState, useEffect, useRef} from 'react';
 import { useParams, useNavigate, Link } from 'react-router';
 import { useNotification } from '@/app/providers/NotificationProvider';
 import { usePageTitle } from '@/hooks/usePageTitle';
@@ -35,16 +35,28 @@ export default function HealthProfileFormPage() {
     }).catch(() => {}).finally(() => setLoadingData(false));
   }, [beneficiaryId]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const submittingRef = useRef(false);
+
   const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); setServerError(null);
-    const valid = await validate(); if (!valid) return;
+    e.preventDefault();
+    if (submittingRef.current) return;
+    submittingRef.current = true;
+    setServerError(null);
+    const valid = await validate();
+    if (!valid) {
+      submittingRef.current = false;
+      return;
+    }
     setSaving(true);
     try {
       const res = await healthProfileService.upsert(beneficiaryId, values);
       if (res.success) { notify('Perfil de salud guardado correctamente.'); navigate(`/beneficiarios/${beneficiaryId}`); }
       else setServerError(res.message || 'Error al guardar.');
     } catch (err) { setServerError(err instanceof ApiError ? getErrorMessage(err) : 'Error de conexión.'); }
-    finally { setSaving(false); }
+    finally {
+      setSaving(false);
+      submittingRef.current = false;
+    }
   };
 
   if (loadingData) return <Loader message="Cargando perfil de salud..." />;

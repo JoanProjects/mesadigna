@@ -7,6 +7,7 @@ export interface IngredientResponse {
   minimumStock: number;
   isLowStock: boolean;
   createdAt: string;
+  isActive: boolean;
 }
 
 export interface CreateIngredientRequest {

@@ -103,7 +103,8 @@ public static class MappingExtensions
         StockQuantity = ingredient.StockQuantity,
         MinimumStock = ingredient.MinimumStock,
         IsLowStock = ingredient.IsLowStock,
-        CreatedAt = ingredient.CreatedAt
+        CreatedAt = ingredient.CreatedAt,
+        IsActive = ingredient.IsActive
     };
 
     // ── Meal ────────────────────────────────────────────────────

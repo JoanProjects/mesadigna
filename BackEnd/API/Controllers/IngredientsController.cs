@@ -58,13 +58,13 @@ public class IngredientsController : ControllerBase
         return Ok(ApiResponse<IngredientResponseDto>.Ok(updated, "Ingrediente actualizado exitosamente."));
     }
 
-    [HttpDelete("{id:int}")]
+    [HttpPut("{id:int}/change-status")]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Deactivate(int id, CancellationToken cancellationToken)
     {
-        var result = await _ingredientService.DeactivateAsync(id, cancellationToken);
+        var result = await _ingredientService.ChangeStatusAsync(id, cancellationToken);
         if (!result)
             return NotFound(ApiResponse<object>.Fail("Ingrediente no encontrado."));
-        return Ok(ApiResponse<object>.Ok(null!, "Ingrediente desactivado exitosamente."));
+        return Ok(ApiResponse<object>.Ok(null!, "Estado del ingrediente actualizado exitosamente."));
     }
 }
