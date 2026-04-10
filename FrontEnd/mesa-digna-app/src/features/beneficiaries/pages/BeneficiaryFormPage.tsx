@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react';
+import {useState, useEffect, useRef} from 'react';
 import {useParams, useNavigate, Link} from 'react-router';
 import {useNotification} from '@/app/providers/NotificationProvider';
 import {usePageTitle} from '@/hooks/usePageTitle';
@@ -14,17 +14,18 @@ import {getFieldErrors, getErrorMessage} from '@/utils/formErrors';
 const calculateAge = (dateOfBirth: string) => {
     if (!dateOfBirth) return null;
 
-    const today = new Date();
-    const birthDate = new Date(dateOfBirth);
-
+    const birthDate = new Date(dateOfBirth + 'T00:00:00Z');
     if (Number.isNaN(birthDate.getTime())) return null;
 
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
+    const now = new Date();
+    const todayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+
+    let age = todayUTC.getUTCFullYear() - birthDate.getUTCFullYear();
+    const monthDiff = todayUTC.getUTCMonth() - birthDate.getUTCMonth();
 
     if (
         monthDiff < 0 ||
-        (monthDiff === 0 && today.getDate() < birthDate.getDate())
+        (monthDiff === 0 && todayUTC.getUTCDate() < birthDate.getUTCDate())
     ) {
         age--;
     }
@@ -112,11 +113,20 @@ export default function BeneficiaryFormPage() {
             .finally(() => setLoadingData(false));
     }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
+    const savedDocumentRef = useRef<string>('');
+
     useEffect(() => {
-        if (isMinor && values.identityDocument) {
-            setValues({identityDocument: ''});
+        if (isMinor) {
+            if (values.identityDocument) {
+                savedDocumentRef.current = values.identityDocument;
+                setValues({ identityDocument: '' });
+            }
+        } else {
+            if (!values.identityDocument && savedDocumentRef.current) {
+                setValues({ identityDocument: savedDocumentRef.current });
+            }
         }
-    }, [isMinor, values.identityDocument, setValues]);
+    }, [isMinor]);
 
     const handleIdentityDocumentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setValues({identityDocument: formatIdentityDocument(e.target.value)});
@@ -126,8 +136,12 @@ export default function BeneficiaryFormPage() {
         setValues({phoneNumber: formatPhoneNumber(e.target.value)});
     };
 
+    const submittingRef = useRef(false);
+
     const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (submittingRef.current) return;
+        submittingRef.current = true;
         setServerError(null);
 
         const valid = await validate();
@@ -169,6 +183,7 @@ export default function BeneficiaryFormPage() {
             }
         } finally {
             setSaving(false);
+            submittingRef.current = false;
         }
     };
 

@@ -29,6 +29,7 @@ export function useForm<T extends Record<string, unknown>>(
       delete next[field];
       return next;
     });
+    setServerError(null);
   }, []);
 
   const setValues = useCallback((vals: Partial<T>) => {

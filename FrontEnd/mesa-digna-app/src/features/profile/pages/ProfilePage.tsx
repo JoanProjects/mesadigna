@@ -34,7 +34,7 @@ export default function ProfilePage() {
         firstName: profile.values.firstName as string,
         lastName: profile.values.lastName as string,
         email: profile.values.email as string,
-        phoneNumber: (profile.values.phoneNumber as string) || undefined,
+        phoneNumber: (profile.values.phoneNumber as string)?.trim() || null,
       });
       notify('Perfil actualizado correctamente.');
     } catch (err) {
