@@ -48,6 +48,7 @@ export default function KitchenDailySummaryPage() {
   const fetchModalPage = async (page: number) => {
     setModalLoading(true);
     try {
+      const res = await kitchenService.getBeneficiariesByCategory(selectedDate, modalCategoryKey, page, 50);
       if (res.success && res.data) {
         setModalBeneficiaries(res.data.items);
         setModalPage(res.data.page);

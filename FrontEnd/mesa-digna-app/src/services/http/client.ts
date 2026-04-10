@@ -1,6 +1,7 @@
 import { ApiError } from './errors';
 import type { ApiResponse } from './types';
 
+const BASE_URL = import.meta.env.VITE_API_URL || '/api';
 const TOKEN_KEY = 'mesa_digna_token';
 const USER_KEY = 'mesa_digna_user';
 

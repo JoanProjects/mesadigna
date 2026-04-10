@@ -8,6 +8,7 @@ import { attendanceService } from '../services/attendance.service';
 import { todayISO, formatDate, formatTime } from '@/utils/formatDate';
 import type { AttendanceResponse, DailySummaryResponse } from '../types/attendance.types';
 
+const PAGE_SIZE = 25;
 
 export default function AttendanceListPage() {
   const { canViewBeneficiaries } = useAuth();
