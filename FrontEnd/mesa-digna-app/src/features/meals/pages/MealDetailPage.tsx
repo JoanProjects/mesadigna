@@ -5,7 +5,7 @@ import {faPen, faPlus, faTrash} from '@fortawesome/free-solid-svg-icons';
 import {useNotification} from '@/app/providers/NotificationProvider';
 import {usePageTitle} from '@/hooks/usePageTitle';
 import {useForm} from '@/hooks/useForm';
-import {Alert, AsyncSelect, Badge, Button, Card, Input, Loader, Select} from '@/components/ui';
+import {Alert, Badge, Button, Card, Input, Loader, Select} from '@/components/ui';
 import {ConfirmDialog} from '@/components/feedback/ConfirmDialog';
 import {mealService} from '../services/meal.service';
 import {ingredientService} from '@/features/ingredients/services/ingredient.service';
@@ -14,7 +14,8 @@ import {UNIT_OPTIONS} from '@/constants/options';
 import {ApiError} from '@/services/http/errors';
 import {getErrorMessage} from '@/utils/formErrors';
 import type {MealResponse} from '../types/meal.types';
-import type {IngredientResponse} from '@/features/ingredients/types/ingredient.types';
+
+type SelectOption = { value: string; label: string };
 
 export default function MealDetailPage() {
     const {id} = useParams();
@@ -24,6 +25,7 @@ export default function MealDetailPage() {
     const [showAddForm, setShowAddForm] = useState(false);
     const [saving, setSaving] = useState(false);
     const [confirmRemove, setConfirmRemove] = useState<number | null>(null);
+    const [ingredientOptions, setIngredientOptions] = useState<SelectOption[]>([]);
 
     usePageTitle(meal?.name || 'Detalle comida');
 
@@ -56,17 +58,22 @@ export default function MealDetailPage() {
 
     const submittingRef = useRef(false);
 
-    const loadIngredients = async (search: string) => {
+    const loadIngredients = async () => {
         try {
-            const res = await ingredientService.getAll(1, 20, search);
+            const res = await ingredientService.getAll(1, 100);
             if (res.success && res.data) {
-                return res.data.items.map(i => ({value: String(i.id), label: i.name}));
+                setIngredientOptions(res.data.items.map(i => ({value: String(i.id), label: i.name})));
             }
         } catch (err) {
             console.error('Error loading ingredients:', err);
         }
-        return [];
     };
+
+    useEffect(() => {
+        if (showAddForm && ingredientOptions.length === 0) {
+            loadIngredients();
+        }
+    }, [showAddForm, ingredientOptions.length]);
 
     const addIngredient = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -108,8 +115,6 @@ export default function MealDetailPage() {
 
     if (loading) return <Loader message="Cargando comida..."/>;
     if (!meal) return <div className="text-center py-12 text-text-secondary">Comida no encontrada.</div>;
-
-    const ingredientOptions = availableIngredients.map(i => ({value: String(i.id), label: i.name}));
 
     return (
         <>
@@ -160,12 +165,12 @@ export default function MealDetailPage() {
                     {showAddForm ? (
                         <form onSubmit={addIngredient} className="space-y-3 p-4 bg-gray-50 rounded-lg">
                             {serverError && <Alert variant="error">{serverError}</Alert>}
-                            <AsyncSelect 
-                                label="Ingrediente" 
+                            <Select
+                                label="Ingrediente"
                                 value={String(values.ingredientId || '')}
-                                onChange={val => setValue('ingredientId', Number(val))}
-                                loadOptions={loadIngredients}
-                                placeholder="Buscar ingrediente..."
+                                onChange={e => setValue('ingredientId', Number(e.target.value))}
+                                options={ingredientOptions}
+                                placeholder="Seleccione..."
                                 error={errors.ingredientId}
                             />
 
