@@ -138,8 +138,8 @@ export default function BeneficiaryFormPage() {
         try {
             const payload = {
                 ...values,
-                identityDocument: isMinor ? '' : (values.identityDocument || '').replace(/\D/g, ''),
-                phoneNumber: (values.phoneNumber || '').replace(/\D/g, ''),
+                identityDocument: isMinor ? null : (values.identityDocument || '').replace(/\D/g, ''),
+                phoneNumber: (values.phoneNumber || '').replace(/\D/g, '') || null,
             };
 
             if (isEdit) {
