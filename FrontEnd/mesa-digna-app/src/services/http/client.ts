@@ -1,7 +1,6 @@
 import { ApiError } from './errors';
 import type { ApiResponse } from './types';
 
-const BASE_URL = 'https://localhost:5001/api';
 const TOKEN_KEY = 'mesa_digna_token';
 const USER_KEY = 'mesa_digna_user';
 

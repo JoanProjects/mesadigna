@@ -1,5 +1,3 @@
-import type { PagedResponse } from '@/services/http/types';
-
 export interface DailyKitchenSummary {
   date: string;
   totalServings: number;
@@ -22,18 +20,7 @@ export interface DietCategoryBeneficiary {
 
 export interface DietarySummary {
   totalBeneficiariesWithRestrictions: number;
-  beneficiaries: PagedResponse<DietaryBeneficiary>;
 }
-
-export interface DietarySummaryFilter {
-  page: number;
-  pageSize: number;
-  startDate?: string;
-  endDate?: string;
-  search?: string;
-}
-
-export type DateRangePreset = 'all' | 'today' | 'yesterday' | 'last7days' | 'thisMonth' | 'custom';
 
 export interface DietaryBeneficiary {
   beneficiaryId: number;

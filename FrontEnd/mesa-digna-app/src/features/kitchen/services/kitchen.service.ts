@@ -4,7 +4,6 @@ import type {
   DailyKitchenSummary,
   DietCategoryBeneficiary,
   DietarySummary,
-  DietarySummaryFilter,
   IngredientsSummary,
   DailyOperationalSummary,
 } from '../types/kitchen.types';
@@ -23,14 +22,6 @@ export const kitchenService = {
     );
   },
 
-  getDietarySummary(filter: DietarySummaryFilter) {
-    return httpGet<DietarySummary>(`${BASE}/dietary-summary`, {
-      page: filter.page,
-      pageSize: filter.pageSize,
-      ...(filter.startDate ? { startDate: filter.startDate } : {}),
-      ...(filter.endDate ? { endDate: filter.endDate } : {}),
-      ...(filter.search ? { search: filter.search } : {}),
-    });
   },
 
   getIngredientsSummary() {
