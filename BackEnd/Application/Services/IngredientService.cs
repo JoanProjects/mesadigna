@@ -92,6 +92,13 @@ public class IngredientService : IIngredientService
         var ingredient = await _ingredientRepository.GetByIdTrackedAsync(id, cancellationToken);
         if (ingredient is null) return false;
 
+        var isDeactivating = ingredient.IsActive;
+        if (isDeactivating &&
+            await _ingredientRepository.IsUsedByAnyMealAsync(id, cancellationToken))
+            throw new ConflictException(
+                "No se puede desactivar el ingrediente porque está siendo usado en una comida.",
+                "id");
+
         ingredient.IsActive = !ingredient.IsActive;
 
         await _ingredientRepository.SaveChangesAsync(cancellationToken);

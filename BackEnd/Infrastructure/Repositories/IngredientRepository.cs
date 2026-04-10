@@ -27,4 +27,11 @@ public class IngredientRepository : BaseRepository<Ingredient>, IIngredientRepos
             .OrderBy(i => i.Name)
             .ToListAsync(cancellationToken);
     }
+
+    public async Task<bool> IsUsedByAnyMealAsync(int ingredientId, CancellationToken cancellationToken = default)
+    {
+        return await Context.MealIngredients
+            .AsNoTracking()
+            .AnyAsync(mi => mi.IngredientId == ingredientId, cancellationToken);
+    }
 }

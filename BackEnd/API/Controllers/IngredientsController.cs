@@ -60,6 +60,7 @@ public class IngredientsController : ControllerBase
 
     [HttpPut("{id:int}/change-status")]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Deactivate(int id, CancellationToken cancellationToken)
     {
         var result = await _ingredientService.ChangeStatusAsync(id, cancellationToken);
