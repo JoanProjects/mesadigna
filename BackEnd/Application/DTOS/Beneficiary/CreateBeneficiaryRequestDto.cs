@@ -19,9 +19,9 @@ public class CreateBeneficiaryRequestDto
     [Required(ErrorMessage = "El sexo es requerido.")]
     [EnumDataType(typeof(Sex))]
     public Sex Sex { get; set; }
-
-    [MaxLength(13)]
-    [MinLength(11)]
+    
+    [MaxLength(11)]
+    [RegularExpression(@"^\d{11}$", ErrorMessage = "La cédula debe tener exactamente 11 dígitos.")]
     public string? IdentityDocument { get; set; }
 
     [Phone]
