@@ -1,58 +1,104 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { faUtensils } from '@fortawesome/free-solid-svg-icons';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { PageHeader } from '@/components/shared/PageHeader';
-import { faInbox } from '@fortawesome/free-solid-svg-icons';
-import { Loader, Badge, EmptyState, Card } from '@/components/ui';
+import { StatsCard } from '@/components/shared/StatsCard';
+import { Loader, SearchInput } from '@/components/ui';
 import { kitchenService } from '../services/kitchen.service';
+import { DietaryDateFilter } from '../components/DietaryDateFilter';
+import { DietaryBeneficiaryTable } from '../components/DietaryBeneficiaryTable';
 import type { DietarySummary } from '../types/kitchen.types';
+
+const PAGE_SIZE = 10;
 
 export default function KitchenDietarySummaryPage() {
   usePageTitle('Cocina - Resumen dietario');
+
   const [summary, setSummary] = useState<DietarySummary | null>(null);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [startDate, setStartDate] = useState<string | undefined>();
+  const [endDate, setEndDate] = useState<string | undefined>();
+  const [search, setSearch] = useState('');
 
-  useEffect(() => {
-    kitchenService.getDietarySummary().then(res => {
-      if (res.success && res.data) setSummary(res.data);
-    }).catch(() => {}).finally(() => setLoading(false));
+  const loadData = useCallback(async (p: number, start?: string, end?: string, s?: string) => {
+    setLoading(true);
+    try {
+      const res = await kitchenService.getDietarySummary({
+        page: p,
+        pageSize: PAGE_SIZE,
+        startDate: start,
+        endDate: end,
+        search: s,
+      });
+      if (res.success && res.data) {
+        setSummary(res.data);
+      }
+    } catch { /* silent */ }
+    setLoading(false);
   }, []);
 
-  if (loading) return <Loader message="Cargando resumen dietario..." />;
+  useEffect(() => {
+    loadData(1);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleDateFilterChange = (start?: string, end?: string) => {
+    setStartDate(start);
+    setEndDate(end);
+    setPage(1);
+    loadData(1, start, end, search);
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    loadData(newPage, startDate, endDate, search);
+  };
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      setPage(1);
+      loadData(1, startDate, endDate, search);
+    }
+  };
+
+  const subtitle = startDate
+    ? `${summary?.totalBeneficiariesWithRestrictions || 0} beneficiarios con restricciones (filtrado por asistencia)`
+    : `${summary?.totalBeneficiariesWithRestrictions || 0} beneficiarios con restricciones alimentarias`;
 
   return (
     <>
-      <PageHeader title="Resumen dietario" subtitle={`${summary?.totalBeneficiariesWithRestrictions || 0} beneficiarios con restricciones alimentarias`} />
-      {!summary || summary.beneficiaries.length === 0 ? (
-        <EmptyState icon={faInbox} title="Sin restricciones" message="No hay beneficiarios con restricciones dietéticas registradas." />
-      ) : (
-        <Card>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead><tr className="border-b border-gray-100">
-                <th className="text-left px-4 py-3 text-xs font-semibold text-text-secondary uppercase tracking-wider">Nombre</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-text-secondary uppercase tracking-wider">Código</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-text-secondary uppercase tracking-wider">Restricciones</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-text-secondary uppercase tracking-wider">Alergias</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-text-secondary uppercase tracking-wider">Condiciones</th>
-              </tr></thead>
-              <tbody>{summary.beneficiaries.map(b => (
-                <tr key={b.beneficiaryId} className="border-b border-gray-50 hover:bg-primary-50/30 transition-colors">
-                  <td className="px-4 py-3 text-sm font-medium">{b.fullName}</td>
-                  <td className="px-4 py-3 text-sm"><code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs">{b.internalCode}</code></td>
-                  <td className="px-4 py-3 text-sm text-text-secondary">{b.dietaryRestrictions || '—'}</td>
-                  <td className="px-4 py-3 text-sm text-text-secondary">{b.allergies || '—'}</td>
-                  <td className="px-4 py-3 text-sm">
-                    <div className="flex gap-1 flex-wrap">
-                      {b.hasHypertension && <Badge variant="warning">Hipertensión</Badge>}
-                      {b.hasDiabetes && <Badge variant="warning">Diabetes</Badge>}
-                      {b.specialConditions && b.specialConditions !== 'Ninguna' && <Badge variant="info">{b.specialConditions}</Badge>}
-                    </div>
-                  </td>
-                </tr>
-              ))}</tbody>
-            </table>
+      <PageHeader title="Resumen dietario" subtitle={subtitle} />
+
+      <div className="space-y-4 mb-4">
+        <DietaryDateFilter onFilterChange={handleDateFilterChange} />
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <StatsCard
+            icon={faUtensils}
+            value={summary?.totalBeneficiariesWithRestrictions || 0}
+            label="Total con restricciones"
+            color="bg-accent-50 text-accent-400"
+          />
+          <div onKeyDown={handleSearchKeyDown}>
+            <SearchInput
+              value={search}
+              onChange={setSearch}
+              placeholder="Buscar por nombre o código (Enter)..."
+            />
           </div>
-        </Card>
+        </div>
+      </div>
+
+      {loading ? (
+        <Loader message="Cargando resumen dietario..." />
+      ) : (
+        <DietaryBeneficiaryTable
+          beneficiaries={summary?.beneficiaries.items || []}
+          page={page}
+          totalPages={summary?.beneficiaries.totalPages || 0}
+          totalCount={summary?.beneficiaries.totalCount || 0}
+          onPageChange={handlePageChange}
+        />
       )}
     </>
   );
