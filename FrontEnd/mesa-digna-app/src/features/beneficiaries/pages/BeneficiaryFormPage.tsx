@@ -80,7 +80,7 @@ export default function BeneficiaryFormPage() {
                         dateOfBirth: b.dateOfBirth.split('T')[0],
                         sex: b.sex,
                         identityDocument: formatIdentityDocument(b.identityDocument || ''),
-                        phoneNumber: b.phoneNumber || '',
+                        phoneNumber: formatPhoneNumber(b.phoneNumber || ''),
                         address: b.address || '',
                         emergencyContact: b.emergencyContact || '',
                         status: b.status,
