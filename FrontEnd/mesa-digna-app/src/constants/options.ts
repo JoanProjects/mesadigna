@@ -38,12 +38,12 @@ export const ROLE_OPTIONS = [
 ];
 
 export const SPECIAL_CONDITION_OPTIONS = [
-  { value: 'Ninguna', label: 'Ninguna' },
-  { value: 'AdultoMayor', label: 'Adulto mayor' },
-  { value: 'Menor', label: 'Menor de edad' },
-  { value: 'Embarazada', label: 'Embarazada' },
-  { value: 'Lactancia', label: 'Lactancia' },
-  { value: 'Discapacidad', label: 'Discapacidad' },
+  { value: 0, label: 'Ninguna' },
+  { value: 1, label: 'Adulto mayor' },
+  { value: 2, label: 'Menor de edad' },
+  { value: 4, label: 'Embarazada' },
+  { value: 8, label: 'Lactancia' },
+  { value: 16, label: 'Discapacidad' },
 ];
 
 export const CHECKIN_METHOD_OPTIONS = [

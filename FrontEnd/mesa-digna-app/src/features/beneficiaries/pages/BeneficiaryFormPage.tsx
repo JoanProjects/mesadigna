@@ -1,37 +1,16 @@
-import {useState, useEffect, useRef} from 'react';
-import {useParams, useNavigate, Link} from 'react-router';
+import {useEffect, useRef, useState} from 'react';
+import {Link, useNavigate, useParams} from 'react-router';
 import {useNotification} from '@/app/providers/NotificationProvider';
 import {usePageTitle} from '@/hooks/usePageTitle';
 import {useForm} from '@/hooks/useForm';
 import {PageHeader} from '@/components/shared/PageHeader';
-import {Input, Select, Textarea, Button, Alert, Loader, Card} from '@/components/ui';
+import {Alert, Button, Card, Input, Loader, Select, Textarea} from '@/components/ui';
 import {beneficiaryService} from '../services/beneficiary.service';
-import {beneficiarySchema} from '../schemas/beneficiary.schema';
 import {SEX_OPTIONS, STATUS_OPTIONS} from '@/constants/options';
 import {ApiError} from '@/services/http/errors';
-import {getFieldErrors, getErrorMessage} from '@/utils/formErrors';
+import {getErrorMessage, getFieldErrors} from '@/utils/formErrors';
+import {beneficiarySchema, calculateAge} from "@/features/beneficiaries/schemas/beneficiary.schema.ts";
 
-const calculateAge = (dateOfBirth: string) => {
-    if (!dateOfBirth) return null;
-
-    const birthDate = new Date(dateOfBirth + 'T00:00:00Z');
-    if (Number.isNaN(birthDate.getTime())) return null;
-
-    const now = new Date();
-    const todayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-
-    let age = todayUTC.getUTCFullYear() - birthDate.getUTCFullYear();
-    const monthDiff = todayUTC.getUTCMonth() - birthDate.getUTCMonth();
-
-    if (
-        monthDiff < 0 ||
-        (monthDiff === 0 && todayUTC.getUTCDate() < birthDate.getUTCDate())
-    ) {
-        age--;
-    }
-
-    return age;
-};
 
 const formatIdentityDocument = (value: string) => {
     const digits = value.replace(/\D/g, '').slice(0, 11);
@@ -65,6 +44,7 @@ export default function BeneficiaryFormPage() {
         serverError,
         setServerError,
         setValues,
+        setValue,
         setErrors,
         validate,
         handleChange,
@@ -113,27 +93,12 @@ export default function BeneficiaryFormPage() {
             .finally(() => setLoadingData(false));
     }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    const savedDocumentRef = useRef<string>('');
-
-    useEffect(() => {
-        if (isMinor) {
-            if (values.identityDocument) {
-                savedDocumentRef.current = values.identityDocument;
-                setValues({ identityDocument: '' });
-            }
-        } else {
-            if (!values.identityDocument && savedDocumentRef.current) {
-                setValues({ identityDocument: savedDocumentRef.current });
-            }
-        }
-    }, [isMinor]);
-
     const handleIdentityDocumentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setValues({identityDocument: formatIdentityDocument(e.target.value)});
+        setValue('identityDocument', formatIdentityDocument(e.target.value));
     };
 
     const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setValues({phoneNumber: formatPhoneNumber(e.target.value)});
+        setValue('phoneNumber', formatPhoneNumber(e.target.value));
     };
 
     const submittingRef = useRef(false);

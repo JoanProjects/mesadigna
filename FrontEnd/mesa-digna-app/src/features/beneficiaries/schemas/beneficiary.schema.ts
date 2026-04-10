@@ -1,20 +1,20 @@
 import {object, string} from 'yup';
 
-const calculateAge = (dateOfBirth: string) => {
+export const calculateAge = (dateOfBirth: string) => {
     if (!dateOfBirth) return null;
 
     const birthDate = new Date(dateOfBirth + 'T00:00:00Z');
     if (Number.isNaN(birthDate.getTime())) return null;
 
     const now = new Date();
-    const todayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+    const todayLocal = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-    let age = todayUTC.getUTCFullYear() - birthDate.getUTCFullYear();
-    const monthDiff = todayUTC.getUTCMonth() - birthDate.getUTCMonth();
+    let age = todayLocal.getUTCFullYear() - birthDate.getUTCFullYear();
+    const monthDiff = todayLocal.getUTCMonth() - birthDate.getUTCMonth();
 
     if (
         monthDiff < 0 ||
-        (monthDiff === 0 && todayUTC.getUTCDate() < birthDate.getUTCDate())
+        (monthDiff === 0 && todayLocal.getUTCDate() < birthDate.getUTCDate())
     ) {
         age--;
     }
