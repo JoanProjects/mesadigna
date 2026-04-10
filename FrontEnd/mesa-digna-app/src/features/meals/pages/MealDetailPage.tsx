@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import {useState, useEffect, useRef} from 'react';
 import { useParams, Link } from 'react-router';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
@@ -48,18 +48,29 @@ export default function MealDetailPage() {
     }).catch(() => {});
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const submittingRef = useRef(false);
+
   const addIngredient = async (e: React.FormEvent) => {
-    e.preventDefault(); setServerError(null);
-    const valid = await validate(); if (!valid) return;
+    e.preventDefault();
+    if (submittingRef.current) return;
+    submittingRef.current = true;
+    setServerError(null);
+    const valid = await validate();
+    if (!valid) {
+      submittingRef.current = false;
+      return;
+    }
     setSaving(true);
     try {
       const res = await mealService.addIngredient(Number(id), values);
       if (res.success && res.data) { setMeal(res.data); notify('Ingrediente agregado.'); reset(); setShowAddForm(false); }
       else setServerError(res.message || 'Error al agregar.');
     } catch (err) { setServerError(err instanceof ApiError ? getErrorMessage(err) : 'Error de conexión.'); }
-    finally { setSaving(false); }
+    finally {
+      setSaving(false);
+      submittingRef.current = false;
+    }
   };
-
   const removeIngredient = async () => {
     if (!confirmRemove || !id) return;
     try {

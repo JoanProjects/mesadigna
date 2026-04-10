@@ -26,7 +26,9 @@ public class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : 
 
     public virtual async Task<TEntity?> GetByIdTrackedAsync(int id, CancellationToken cancellationToken = default)
     {
-        return await DbSet.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+        return await DbSet
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
     }
 
     public virtual async Task<List<TEntity>> GetAllAsync(CancellationToken cancellationToken = default)
@@ -40,8 +42,8 @@ public class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : 
         Expression<Func<TEntity, object>>? orderBy = null,
         CancellationToken cancellationToken = default)
     {
-        var query = DbSet.AsNoTracking().AsQueryable();
-
+        var query = DbSet.AsNoTracking().IgnoreQueryFilters().AsQueryable();
+        
         if (filter is not null)
             query = query.Where(filter);
 

@@ -87,14 +87,20 @@ public class IngredientService : IIngredientService
         return ingredient.ToDto();
     }
 
-    public async Task<bool> DeactivateAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<bool> ChangeStatusAsync(int id, CancellationToken cancellationToken = default)
     {
         var ingredient = await _ingredientRepository.GetByIdTrackedAsync(id, cancellationToken);
         if (ingredient is null) return false;
 
-        ingredient.IsActive = false;
+        ingredient.IsActive = !ingredient.IsActive;
+
         await _ingredientRepository.SaveChangesAsync(cancellationToken);
-        _logger.LogInformation("Ingrediente desactivado: {Id}", id);
+
+        _logger.LogInformation(
+            "Ingrediente {Estado}: {Id}",
+            ingredient.IsActive ? "activado" : "desactivado",
+            id);
+
         return true;
     }
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import {useState, useEffect, useMemo, useRef} from 'react';
 import { useParams, useNavigate, Link } from 'react-router';
 import { useNotification } from '@/app/providers/NotificationProvider';
 import { usePageTitle } from '@/hooks/usePageTitle';
@@ -35,9 +35,18 @@ export default function UserFormPage() {
     }).catch(() => {}).finally(() => setLoadingData(false));
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const submittingRef = useRef(false);
+
   const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); setServerError(null);
-    const valid = await validate(); if (!valid) return;
+    e.preventDefault();
+    if (submittingRef.current) return;
+    submittingRef.current = true;
+    setServerError(null);
+    const valid = await validate();
+    if (!valid) {
+      submittingRef.current = false;
+      return;
+    }
     setSaving(true);
     try {
       if (isEdit) {
@@ -51,7 +60,10 @@ export default function UserFormPage() {
       }
     } catch (err) {
       if (err instanceof ApiError) { const fe = getFieldErrors(err); if (Object.keys(fe).length > 0) setErrors(fe); setServerError(getErrorMessage(err)); }
-    } finally { setSaving(false); }
+    } finally {
+      setSaving(false);
+      submittingRef.current = false;
+    }
   };
 
   if (loadingData) return <Loader message="Cargando datos..." />;

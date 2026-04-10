@@ -145,7 +145,10 @@ export default function BeneficiaryFormPage() {
         setServerError(null);
 
         const valid = await validate();
-        if (!valid) return;
+        if (!valid) {
+            submittingRef.current = false;
+            return;
+        }
 
         setSaving(true);
 
