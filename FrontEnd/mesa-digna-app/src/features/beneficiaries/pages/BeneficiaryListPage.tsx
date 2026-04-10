@@ -32,7 +32,6 @@ export default function BeneficiaryListPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [page, setPage] = useState(1);
-  const [totalCount, setTotalCount] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -44,7 +43,6 @@ export default function BeneficiaryListPage() {
       const res = await beneficiaryService.getAll({ page: p, pageSize: 10, search: s || undefined, status: st || undefined });
       if (res.success && res.data) {
         setBeneficiaries(res.data.items);
-        setTotalCount(res.data.totalCount);
         setTotalPages(res.data.totalPages);
       }
     } catch { /* silent */ }
@@ -121,9 +119,8 @@ export default function BeneficiaryListPage() {
               ))}</tbody>
             </table>
           </div>
-          <div className="flex items-center justify-center gap-2 py-4 border-t border-gray-100">
+          <div className="px-2 py-4 border-t border-gray-100">
             <Pagination page={page} totalPages={totalPages} onPageChange={onPageChange} />
-            <span className="text-xs text-text-light ml-2">{totalCount} registros</span>
           </div>
         </div>
       )}

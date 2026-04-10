@@ -23,8 +23,8 @@ export default function KitchenOperationalSummaryPage() {
     setLoading(false);
   };
 
-  useEffect(() => { loadData(selectedDate); }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  const onDateChange = (date: string) => { setSelectedDate(date); loadData(date); };
+  useEffect(() => { loadData(selectedDate).then(r => r); }, []);
+  const onDateChange = (date: string) => { setSelectedDate(date); loadData(date).then(r => r); };
 
   if (loading) return <Loader message="Cargando resumen operacional..." />;
 
