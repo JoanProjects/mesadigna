@@ -123,12 +123,13 @@ export default function HealthProfileFormPage() {
                                 <Checkbox
                                     key={option.value}
                                     label={option.label}
-                                    checked={((values.specialConditions as number) & option.value) !== 0}
+                                    checked={((values.specialConditions as number) & (option.value as number)) !== 0}
                                     onChange={(checked) => {
                                         const current = (values.specialConditions as number) || 0;
+                                        const val = option.value as number;
                                         const updated = checked
-                                            ? current | option.value
-                                            : current & ~option.value;
+                                            ? current | val
+                                            : current & ~val;
                                         setValue('specialConditions', updated);
                                     }}
                                 />

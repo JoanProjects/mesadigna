@@ -5,7 +5,7 @@ import {faPen, faPlus, faTrash} from '@fortawesome/free-solid-svg-icons';
 import {useNotification} from '@/app/providers/NotificationProvider';
 import {usePageTitle} from '@/hooks/usePageTitle';
 import {useForm} from '@/hooks/useForm';
-import {Alert, Badge, Button, Card, Input, Loader, Select} from '@/components/ui';
+import {Alert, AsyncSelect, Badge, Button, Card, Input, Loader, Select} from '@/components/ui';
 import {ConfirmDialog} from '@/components/feedback/ConfirmDialog';
 import {mealService} from '../services/meal.service';
 import {ingredientService} from '@/features/ingredients/services/ingredient.service';
@@ -21,7 +21,6 @@ export default function MealDetailPage() {
     const {success: notify, error: notifyError} = useNotification();
     const [meal, setMeal] = useState<MealResponse | null>(null);
     const [loading, setLoading] = useState(true);
-    const [availableIngredients, setAvailableIngredients] = useState<IngredientResponse[]>([]);
     const [showAddForm, setShowAddForm] = useState(false);
     const [saving, setSaving] = useState(false);
     const [confirmRemove, setConfirmRemove] = useState<number | null>(null);
@@ -53,13 +52,21 @@ export default function MealDetailPage() {
 
     useEffect(() => {
         loadMeal();
-        ingredientService.getAll(1, 200).then(res => {
-            if (res.success && res.data) setAvailableIngredients(res.data.items);
-        }).catch(() => {
-        });
     }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const submittingRef = useRef(false);
+
+    const loadIngredients = async (search: string) => {
+        try {
+            const res = await ingredientService.getAll(1, 20, search);
+            if (res.success && res.data) {
+                return res.data.items.map(i => ({value: String(i.id), label: i.name}));
+            }
+        } catch (err) {
+            console.error('Error loading ingredients:', err);
+        }
+        return [];
+    };
 
     const addIngredient = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -153,10 +160,14 @@ export default function MealDetailPage() {
                     {showAddForm ? (
                         <form onSubmit={addIngredient} className="space-y-3 p-4 bg-gray-50 rounded-lg">
                             {serverError && <Alert variant="error">{serverError}</Alert>}
-                            <Select label="Ingrediente" value={String(values.ingredientId)}
-                                    onChange={e => setValue('ingredientId', Number(e.target.value))}
-                                    options={ingredientOptions} placeholder="Seleccione..."
-                                    error={errors.ingredientId}/>
+                            <AsyncSelect 
+                                label="Ingrediente" 
+                                value={String(values.ingredientId || '')}
+                                onChange={val => setValue('ingredientId', Number(val))}
+                                loadOptions={loadIngredients}
+                                placeholder="Buscar ingrediente..."
+                                error={errors.ingredientId}
+                            />
 
                             <div className="grid grid-cols-2 gap-3">
                                 <Input label="Cantidad por porción" type="number" step="0.01" min="0.01"
