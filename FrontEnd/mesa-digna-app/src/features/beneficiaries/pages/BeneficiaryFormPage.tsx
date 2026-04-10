@@ -41,6 +41,16 @@ const formatIdentityDocument = (value: string) => {
     return `${digits.slice(0, 3)}-${digits.slice(3, 10)}-${digits.slice(10)}`;
 };
 
+const formatPhoneNumber = (value: string) => {
+    const digits = value.replace(/\D/g, '').slice(0, 10);
+
+    if (digits.length <= 3) return digits;
+    if (digits.length <= 6) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+
+    return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`;
+};
+
+
 export default function BeneficiaryFormPage() {
     const {id} = useParams();
     const navigate = useNavigate();
@@ -112,6 +122,10 @@ export default function BeneficiaryFormPage() {
         setValues({identityDocument: formatIdentityDocument(e.target.value)});
     };
 
+    const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setValues({phoneNumber: formatPhoneNumber(e.target.value)});
+    };
+
     const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setServerError(null);
@@ -125,6 +139,7 @@ export default function BeneficiaryFormPage() {
             const payload = {
                 ...values,
                 identityDocument: isMinor ? '' : (values.identityDocument || '').replace(/\D/g, ''),
+                phoneNumber: (values.phoneNumber || '').replace(/\D/g, ''),
             };
 
             if (isEdit) {
@@ -216,7 +231,7 @@ export default function BeneficiaryFormPage() {
                         <Input
                             label="Teléfono"
                             value={values.phoneNumber ?? ''}
-                            onChange={handleChange('phoneNumber')}
+                            onChange={handlePhoneNumberChange}
                             error={errors.phoneNumber}
                         />
                     </div>

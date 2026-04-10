@@ -54,7 +54,13 @@ export const beneficiarySchema = object({
     ,
     phoneNumber: string()
         .nullable()
-        .default(''),
+        .default('')
+        .transform((value) => value?.trim?.() ?? '')
+        .test('phone-format', 'El teléfono debe tener 10 dígitos.', (value) => {
+            if (!value) return true; // opcional
+            const digits = value.replace(/\D/g, '');
+            return digits.length === 10;
+        }),
     address: string()
         .nullable()
         .default(''),
