@@ -8,6 +8,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Train model on startup if not present
+WORKDIR /
 RUN python -c "from app.ml.model import PortionPredictionModel; m = PortionPredictionModel(); m.ensure_trained()"
 
 EXPOSE 8000

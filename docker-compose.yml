@@ -1,0 +1,81 @@
+services:
+
+  # ── SQL Server ──────────────────────────────────────────────────────────────
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    platform: linux/amd64
+    container_name: mesadigna-sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Developer
+      SA_PASSWORD: ${SA_PASSWORD:-slifer@Klk2020}
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    restart: unless-stopped
+    healthcheck:
+      test: >
+        /opt/mssql-tools18/bin/sqlcmd
+        -S localhost -U SA -P "$$SA_PASSWORD"
+        -Q "SELECT 1" -No -l 5
+      interval: 15s
+      timeout: 10s
+      retries: 12
+      start_period: 45s
+
+  # ── Python prediction microservice ──────────────────────────────────────────
+  prediction-service:
+    build:
+      context: ./PredictionService/app
+      dockerfile: Dockerfile
+    container_name: mesadigna-prediction
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  # ── .NET 10 backend API ─────────────────────────────────────────────────────
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mesadigna-backend
+    ports:
+      - "7001:7001"
+
+    environment:
+      # Apuntar al servicio de SQL Server del compose en vez de localhost
+      DB_SERVER: sqlserver
+      DB_DATABASE: MesaDignaDb
+      DB_USER: sa
+      DB_PASSWORD: slifer@Klk2020
+
+      # Apuntar al microservicio Python dentro de la red de Docker
+      PredictionService__BaseUrl: http://prediction-service:8000
+
+      # HTTPS en Kestrel
+      ASPNETCORE_URLS: "https://+:7001"
+      ASPNETCORE_Kestrel__Certificates__Default__Path: /root/.aspnet/https/aspnetapp.pfx
+      ASPNETCORE_Kestrel__Certificates__Default__Password: MesaDigna2024!
+      ASPNETCORE_ENVIRONMENT: Production
+
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      prediction-service:
+        condition: service_healthy
+    restart: unless-stopped
+
+# ── Volumen persistente para SQL Server ─────────────────────────────────────
+# Este volumen mantiene los datos entre reinicios y recompilar imágenes.
+# Los datos existentes de una instancia previa deben restaurarse una sola vez
+# (ver instrucciones en README).
+volumes:
+  sqlserver_data:
+    name: mesadigna_sqlserver_data
