@@ -31,21 +31,25 @@ async function request<T>(url: string, options: RequestInit = {}): Promise<ApiRe
   } catch {
     throw new ApiError(0, 'Error de conexión. Verifique su red e intente nuevamente.');
   }
-
-  if (response.status === 401) {
+  if (response.status === 401 && url !== '/auth/login') {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
     window.location.href = '/login';
     throw new ApiError(401, 'Sesión expirada.');
   }
 
-  const json = await response.json();
+  let json: Record<string, unknown>;
+  try {
+    json = await response.json();
+  } catch {
+    json = {};
+  }
 
   if (!response.ok) {
     throw ApiError.fromResponse(response.status, json);
   }
 
-  return json as ApiResponse<T>;
+  return json as unknown as ApiResponse<T>;
 }
 
 export function httpGet<T>(url: string, params?: Record<string, string | number | boolean>): Promise<ApiResponse<T>> {
