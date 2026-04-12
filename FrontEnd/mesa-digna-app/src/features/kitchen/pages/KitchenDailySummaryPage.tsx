@@ -51,10 +51,10 @@ export default function KitchenDailySummaryPage() {
         loadData(date);
     };
 
-    const fetchModalPage = async (page: number) => {
+    const fetchModalPage = async (page: number, categoryKey: string = modalCategoryKey) => {
         setModalLoading(true);
         try {
-            const res = await kitchenService.getBeneficiariesByCategory(selectedDate, modalCategoryKey, page, 10);
+            const res = await kitchenService.getBeneficiariesByCategory(selectedDate, categoryKey, page, 10);
             if (res.success && res.data) {
                 setModalBeneficiaries(res.data.items);
                 setModalPage(res.data.page);
@@ -75,7 +75,7 @@ export default function KitchenDailySummaryPage() {
         setModalTotalPages(0);
         setModalTotalCount(0);
         setModalOpen(true);
-        fetchModalPage(1);
+        fetchModalPage(1, categoryKey);
     };
 
     const closeModal = () => setModalOpen(false);
