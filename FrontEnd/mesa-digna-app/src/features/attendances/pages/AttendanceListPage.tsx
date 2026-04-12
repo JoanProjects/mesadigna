@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router';
-import { faUsers, faMars, faVenus, faChild, faInbox } from '@fortawesome/free-solid-svg-icons';
+import { faUsers, faMars, faVenus, faChild, faInbox, faGenderless } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '@/app/providers/AuthProvider';
 import { StatsCard } from '@/components/shared/StatsCard';
 import { Loader, Badge, Pagination, SearchInput, EmptyState } from '@/components/ui';
@@ -122,15 +122,16 @@ export default function AttendanceListPage() {
         )}
       </div>
 
-      {/* Summary cards */}
-      {filterMode === 'date' && summary && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-          <StatsCard icon={faUsers} value={summary.totalAttendees} label="Total asistentes" color="bg-primary-50 text-primary-500" />
-          <StatsCard icon={faMars} value={summary.totalMale} label="Masculino" color="bg-blue-50 text-blue-500" />
-          <StatsCard icon={faVenus} value={summary.totalFemale} label="Femenino" color="bg-pink-50 text-pink-500" />
-          <StatsCard icon={faChild} value={summary.totalMinors} label="Menores" color="bg-accent-50 text-accent-400" />
-        </div>
-      )}
+       {/* Summary cards */}
+       {filterMode === 'date' && summary && (
+         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-4">
+           <StatsCard icon={faUsers} value={summary.totalAttendees} label="Total asistentes" color="bg-primary-50 text-primary-500" />
+           <StatsCard icon={faMars} value={summary.totalMale} label="Masculino" color="bg-blue-50 text-blue-500" />
+           <StatsCard icon={faVenus} value={summary.totalFemale} label="Femenino" color="bg-pink-50 text-pink-500" />
+           <StatsCard icon={faChild} value={summary.totalMinors} label="Menores" color="bg-accent-50 text-accent-400" />
+           <StatsCard icon={faGenderless} value={summary.totalOther} label="Otros" color="bg-gray-50 text-gray-500" />
+         </div>
+       )}
 
       {/* Search */}
       <div className="mb-4">
