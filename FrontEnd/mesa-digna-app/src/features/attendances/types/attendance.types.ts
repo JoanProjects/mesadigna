@@ -23,6 +23,6 @@ export interface DailySummaryResponse {
   totalFemale: number;
   totalOther: number;
   totalMinors: number;
+  totalAdults: number;
   totalElders: number;
-  totalWithDietaryConsiderations: number;
 }

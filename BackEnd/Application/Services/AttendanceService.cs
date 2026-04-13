@@ -105,10 +105,8 @@ public class AttendanceService : IAttendanceService
             TotalFemale = attendances.Count(a => a.Beneficiary.Sex == Sex.Femenino),
             TotalOther = attendances.Count(a => a.Beneficiary.Sex == Sex.Otro),
             TotalMinors = attendances.Count(a => a.Beneficiary.Age < 18),
-            TotalElders = attendances.Count(a => a.Beneficiary.Age >= 65),
-            TotalWithDietaryConsiderations = attendances.Count(a =>
-                a.Beneficiary.HealthProfile is not null &&
-                a.Beneficiary.HealthProfile.HasDietaryConsiderations)
+            TotalAdults = attendances.Count(a => a.Beneficiary.Age >= 18 && a.Beneficiary.Age < 65),
+            TotalElders = attendances.Count(a => a.Beneficiary.Age >= 65)
         };
 
         return summary;

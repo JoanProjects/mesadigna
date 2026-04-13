@@ -8,6 +8,6 @@ public class DailySummaryResponseDto
     public int TotalFemale { get; set; }
     public int TotalOther { get; set; }
     public int TotalMinors { get; set; }
+    public int TotalAdults { get; set; }
     public int TotalElders { get; set; }
-    public int TotalWithDietaryConsiderations { get; set; }
 }
